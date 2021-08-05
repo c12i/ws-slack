@@ -4,8 +4,8 @@ const socketio = require('socket.io')
 const app = express()
 app.use(express.static(__dirname + '/public'))
 
-const expressServer = app.listen(4231, () => {
-    console.info('listening for connections on port 4231')
+const expressServer = app.listen(6969, () => {
+    console.info('listening for connections on port 6969')
 })
 const io = socketio(expressServer)
 
