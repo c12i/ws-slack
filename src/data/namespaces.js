@@ -38,6 +38,6 @@ mozNs.addRoom(new Room(3, 'Rust', 'Mozilla'))
 linuxNs.addRoom(new Room(0, 'Debian', 'Linux'))
 linuxNs.addRoom(new Room(1, 'Red Hat', 'Linux'))
 linuxNs.addRoom(new Room(2, 'MacOs', 'Linux'))
-linuxNs.addRoom(new Room(3, 'Kernal Development', 'Linux'))
+linuxNs.addRoom(new Room(3, 'Kernel Development', 'Linux'))
 
 module.exports = namespaces
