@@ -27,7 +27,7 @@ io.on('connection', (socket, _req) => {
 namespaces.forEach((ns) => {
     io.of(ns.endpoint).on('connection', (nsSocket) => {
         console.log(`${nsSocket.id} has joined ${ns.endpoint} namespace`)
-        nsSocket.emit('ns-room-load', namespaces[0].rooms)
+        nsSocket.emit('ns-room-load', ns.rooms)
         nsSocket.on('join-room', (roomData, userCountCallback) => {
             const joinedRoom = ns.rooms.find((room) => room.id === roomData.id)
 

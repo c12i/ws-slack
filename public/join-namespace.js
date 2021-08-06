@@ -1,4 +1,10 @@
 function joinNamespaceAndLoadRooms(ns) {
+    if (nsio) {
+        nsio.close()
+        document
+            .querySelector('#user-input')
+            .removeEventListener('submit', formSubmission)
+    }
     nsio = io(`http://localhost:6969${ns.endpoint}`)
     nsio.on('ns-room-load', (nsRooms) => {
         const roomList = document.querySelector('.room-list')
@@ -46,17 +52,7 @@ function joinNamespaceAndLoadRooms(ns) {
 
     document
         .querySelector('#user-input')
-        .addEventListener('submit', (event) => {
-            event.preventDefault()
-            const message = document.querySelector('#user-message')
-            nsio.emit('new-message-to-server', {
-                text: message.value,
-                timeStamp: new Date(),
-                username,
-                avatar: `https://via.placeholder.com/30`,
-            })
-            message.value = ''
-        })
+        .addEventListener('submit', formSubmission)
 }
 
 function buildMessage(msg) {
@@ -71,4 +67,16 @@ function buildMessage(msg) {
 		<div class="message-text">${msg.text}</div>
 	</div>
 	`
+}
+
+function formSubmission(event) {
+    event.preventDefault()
+    const message = document.querySelector('#user-message')
+    nsio.emit('new-message-to-server', {
+        text: message.value,
+        timeStamp: new Date(),
+        username,
+        avatar: `https://via.placeholder.com/30`,
+    })
+    message.value = ''
 }
