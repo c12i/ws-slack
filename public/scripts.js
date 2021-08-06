@@ -1,4 +1,5 @@
 const socket = io('http://localhost:6969')
+let nsio
 
 const existing = sessionStorage.getItem(`username`)
 let username
@@ -15,9 +16,10 @@ socket.on('ns-list', (nsList) => {
     namespaces.innerHTML = ''
     nsList.forEach((ns) => {
         const namespace = document.createElement('div')
-        namespace['ns'] = ns.endpoint
+        namespace.setAttribute('ns', ns.endpoint)
         namespace.classList.add('namespace')
         namespace.addEventListener('click', () => {
+            socket.emit('switched-namespace', ns.id)
             joinNamespaceAndLoadRooms(ns)
         })
 
@@ -26,9 +28,6 @@ socket.on('ns-list', (nsList) => {
         image.alt = 'logo'
         namespace.appendChild(image)
         namespaces.appendChild(namespace)
-
-        joinNamespaceAndLoadRooms(ns)
     })
+    joinNamespaceAndLoadRooms(nsList[0])
 })
-
-socket.on('message-from-server', (message) => {})
