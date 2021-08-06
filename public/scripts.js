@@ -11,6 +11,29 @@ if (existing) {
     sessionStorage.setItem('username', username)
 }
 
+function createNamespaceRooms(nsRooms) {
+    const roomList = document.querySelector('.room-list')
+    roomList.innerHTML = ''
+    nsRooms.forEach((room) => {
+        const listElement = document.createElement('li')
+        listElement.textContent = room.roomTitle
+        const spanElement = document.createElement('span')
+        spanElement.classList.add('glyphicon')
+        if (room.privateRoom) {
+            spanElement.classList.add('glyphicon-lock')
+        } else {
+            spanElement.classList.add('glyphicon-globe')
+        }
+        listElement.appendChild(spanElement)
+        roomList.appendChild(listElement)
+
+        // add click event listener for each room node
+        listElement.addEventListener('click', (event) => {
+            console.log('someone clicked on the', event.target.innerText)
+        })
+    })
+}
+
 socket.on('ns-list', (nsList) => {
     const namespaces = document.querySelector('.namespaces')
     namespaces.innerHTML = ''
@@ -22,8 +45,8 @@ socket.on('ns-list', (nsList) => {
         namespace.addEventListener('click', () => {
             socket.emit('joining-namespace', { username, namespace: ns })
             nsio = io(`http://localhost:6969${ns.endpoint}`)
-            nsio.on('ns-room-load', (rooms) => {
-                console.log(rooms)
+            nsio.on('ns-room-load', (nsRooms) => {
+                createNamespaceRooms(nsRooms)
             })
         })
 
@@ -34,8 +57,8 @@ socket.on('ns-list', (nsList) => {
         namespaces.appendChild(namespace)
 
         nsio = io(`http://localhost:6969${nsList[0].endpoint}`)
-        nsio.on('ns-room-load', (rooms) => {
-            const roomList = document.querySelector('.room-list')
+        nsio.on('ns-room-load', (nsRooms) => {
+            createNamespaceRooms(nsRooms)
         })
     })
 })
