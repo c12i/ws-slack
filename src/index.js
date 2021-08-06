@@ -13,7 +13,11 @@ const io = socketio(expressServer)
 io.on('connection', (socket, _req) => {
     // build an array to send back with a list of endpoints and image urls
     // note that this data could also be getting fetched from an external source too i.e db
-    const nsData = namespaces.map(({ img, endpoint }) => ({ img, endpoint }))
+    const nsData = namespaces.map(({ id, img, endpoint }) => ({
+        id,
+        img,
+        endpoint,
+    }))
 
     // send the ns data back to the client
     socket.emit('ns-list', nsData)

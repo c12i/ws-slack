@@ -1,5 +1,5 @@
-function joinNamespaceAndLoadRooms(endpoint) {
-    const nsio = io(`http://localhost:6969${endpoint}`)
+function joinNamespaceAndLoadRooms(ns) {
+    const nsio = io(`http://localhost:6969${ns.endpoint}`)
     nsio.on('ns-room-load', (nsRooms) => {
         const roomList = document.querySelector('.room-list')
         roomList.innerHTML = ''

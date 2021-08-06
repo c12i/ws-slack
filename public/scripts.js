@@ -18,7 +18,7 @@ socket.on('ns-list', (nsList) => {
         namespace['ns'] = ns.endpoint
         namespace.classList.add('namespace')
         namespace.addEventListener('click', () => {
-            joinNamespaceAndLoadRooms(ns.endpoint)
+            joinNamespaceAndLoadRooms(ns)
         })
 
         const image = document.createElement('img')
@@ -27,21 +27,8 @@ socket.on('ns-list', (nsList) => {
         namespace.appendChild(image)
         namespaces.appendChild(namespace)
 
-        joinNamespaceAndLoadRooms(ns.endpoint)
+        joinNamespaceAndLoadRooms(ns)
     })
 })
 
 socket.on('message-from-server', (message) => {})
-
-document.querySelector('.message-form').addEventListener('submit', (event) => {
-    event.preventDefault()
-    const message = document.querySelector('#user-message').value
-    socket.emit('new-message-to-server', { text: message })
-})
-
-socket.on('message-to-clients', (message) => {
-    console.log(message)
-    const messageNode = document.createElement('li')
-    messageNode.textContent = message
-    document.querySelector('#messages').appendChild(messageNode)
-})
