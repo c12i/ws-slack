@@ -17,16 +17,12 @@ io.on('connection', (socket, _req) => {
 
     // send the ns data back to the client
     socket.emit('ns-list', nsData)
-
-    socket.on('joining-namespace', (data) => {
-        console.info('user joined', data)
-    })
 })
 
 // loop through each namespace and listen to a connection
 namespaces.forEach((ns) => {
-    io.of(ns.endpoint).on('connection', (socket) => {
-        console.log(`${socket.id} has joined ${ns.endpoint}`)
-        socket.emit('hello', `Hello welcome to the ${ns.nsTitle} namespace`)
+    io.of(ns.endpoint).on('connection', (nsSocket) => {
+        console.log(`${nsSocket.id} has joined ${ns.endpoint}`)
+        nsSocket.emit('ns-room-load', namespaces[0].rooms)
     })
 })

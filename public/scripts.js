@@ -1,4 +1,5 @@
 const socket = io('http://localhost:6969')
+let nsio
 
 const existing = sessionStorage.getItem(`username`)
 let username
@@ -19,8 +20,11 @@ socket.on('ns-list', (nsList) => {
         namespace['ns'] = ns.endpoint
         namespace.classList.add('namespace')
         namespace.addEventListener('click', () => {
-            console.log(ns)
             socket.emit('joining-namespace', { username, namespace: ns })
+            nsio = io(`http://localhost:6969${ns.endpoint}`)
+            nsio.on('ns-room-load', (rooms) => {
+                console.log(rooms)
+            })
         })
 
         const image = document.createElement('img')
@@ -28,20 +32,10 @@ socket.on('ns-list', (nsList) => {
         image.alt = 'logo'
         namespace.appendChild(image)
         namespaces.appendChild(namespace)
+
+        nsio = io(`http://localhost:6969${nsList[0].endpoint}`)
+        nsio.on('ns-room-load', (rooms) => {
+            const roomList = document.querySelector('.room-list')
+        })
     })
-})
-
-const messageForm = document.getElementById('message-form')
-messageForm.addEventListener('submit', (event) => {
-    event.preventDefault()
-    const input = document.getElementById('user-message')
-    socket.emit('new-message', { text: input.value })
-    input.value = ''
-})
-
-socket.on('message-to-clients', ({ text }) => {
-    const listGroup = document.getElementById('messages')
-    const listItem = document.createElement('li')
-    listItem.textContent = text
-    listGroup.appendChild(listItem)
 })
