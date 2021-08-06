@@ -28,14 +28,14 @@ namespaces.forEach((ns) => {
     io.of(ns.endpoint).on('connection', (nsSocket) => {
         console.log(`${nsSocket.id} has joined ${ns.endpoint} namespace`)
         nsSocket.emit('ns-room-load', namespaces[0].rooms)
-
         nsSocket.on('join-room', (roomData, userCountCallback) => {
-            console.log(
-                `${nsSocket.id} had joined the ${roomData.roomTitle} room`
-            )
             const joinedRoom = ns.rooms.find((room) => room.id === roomData.id)
-            // TODO: handle history
+
+            // join room and emit message history
             nsSocket.join(joinedRoom.roomTitle)
+            nsSocket.emit('history-catch-up', joinedRoom.history)
+
+            // send number of connected sockets
             io.of(ns.endpoint)
                 .in(joinedRoom.roomTitle)
                 .fetchSockets()
@@ -43,7 +43,7 @@ namespaces.forEach((ns) => {
                     userCountCallback(totalSockets.length)
                     io.of(ns.endpoint)
                         .in(joinedRoom.roomTitle)
-                        .emit('new-user-joined', totalSockets.length)
+                        .emit('update-user-count', totalSockets.length)
                 })
                 .catch((err) => {
                     throw err
@@ -51,15 +51,30 @@ namespaces.forEach((ns) => {
         })
 
         nsSocket.on('new-message-to-server', (message) => {
-            console.log(`We have a new message from ${nsSocket.id}`, message)
             const roomToSend = Array.from(nsSocket.rooms.values())[1]
+            const roomObj = ns.rooms.find(
+                (room) => room.roomTitle === roomToSend
+            )
+            roomObj.addMessage(message)
             io.of(ns.endpoint)
                 .in(roomToSend)
                 .emit(`message-to-clients`, message)
         })
 
         nsSocket.on('disconnect', () => {
-            console.log(`${nsSocket.id} has disconnected`)
+            const roomToLeave = Array.from(nsSocket.rooms.values())[1]
+            nsSocket.leave(roomToLeave)
+            io.of(ns.endpoint)
+                .in(roomToLeave)
+                .fetchSockets()
+                .then((totalSockets) => {
+                    io.of(ns.endpoint)
+                        .in(roomToLeave)
+                        .emit('update-user-count', totalSockets.length)
+                })
+                .catch((err) => {
+                    throw err
+                })
         })
     })
 })

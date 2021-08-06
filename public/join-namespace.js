@@ -38,16 +38,7 @@ function joinNamespaceAndLoadRooms(ns) {
         joinRoom(room)
     })
 
-    nsio.on('new-user-joined', (updatedCount) => {
-        const memberCountNode = document.querySelector('.curr-room-num-users')
-        const spanNode = document.createElement('span')
-        spanNode.classList = 'glyphicon glyphicon-user'
-        memberCountNode.textContent = updatedCount + ' '
-        memberCountNode.appendChild(spanNode)
-    })
-
     nsio.on('message-to-clients', (message) => {
-        console.log(message)
         const messageNode = document.createElement('li')
         messageNode.innerHTML = buildMessage(message)
         document.querySelector('#messages').appendChild(messageNode)
@@ -77,7 +68,7 @@ function buildMessage(msg) {
 		<div class="user-name-time">${msg.username} <span>${new Date(
         msg.timeStamp
     ).toLocaleString()}</span></div>
-		<div class="message-text">I${msg.text}</div>
+		<div class="message-text">${msg.text}</div>
 	</div>
 	`
 }
