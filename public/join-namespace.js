@@ -25,11 +25,10 @@ function joinNamespaceAndLoadRooms(ns) {
             roomList.appendChild(listElement)
 
             // add click event listener for each room node
-            listElement.addEventListener('click', (event) => {
-                console.log('someone clicked on the', room.roomTitle)
+            listElement.addEventListener('click', () => {
                 // TODO: join room
                 joinRoom({
-                    roomId: room.id,
+                    roomId: room.roomId,
                     roomTitle: room.roomTitle,
                 })
             })

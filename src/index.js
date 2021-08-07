@@ -29,25 +29,21 @@ namespaces.forEach((ns) => {
         console.log(`${nsSocket.id} has joined ${ns.endpoint} namespace`)
         nsSocket.emit('ns-room-load', ns.rooms)
         nsSocket.on('join-room', (roomData, userCountCallback) => {
-            const joinedRoom = ns.rooms.find((room) => room.id === roomData.id)
+            // leave the room the user was in
+            const prevRoom = Array.from(nsSocket.rooms.values())[1]
+            nsSocket.leave(prevRoom)
+            // update socket count on leaving
+            updateUserCount(ns, prevRoom, userCountCallback)
+
+            const joinedRoom = ns.rooms.find(
+                (room) => room.roomId === roomData.roomId
+            )
 
             // join room and emit message history
-            nsSocket.join(joinedRoom.roomTitle)
+            nsSocket.join(roomData.roomTitle)
             nsSocket.emit('history-catch-up', joinedRoom.history)
-
             // send number of connected sockets
-            io.of(ns.endpoint)
-                .in(joinedRoom.roomTitle)
-                .fetchSockets()
-                .then((totalSockets) => {
-                    userCountCallback(totalSockets.length)
-                    io.of(ns.endpoint)
-                        .in(joinedRoom.roomTitle)
-                        .emit('update-user-count', totalSockets.length)
-                })
-                .catch((err) => {
-                    throw err
-                })
+            updateUserCount(ns, roomData.roomTitle, userCountCallback)
         })
 
         nsSocket.on('new-message-to-server', (message) => {
@@ -78,3 +74,18 @@ namespaces.forEach((ns) => {
         })
     })
 })
+
+function updateUserCount(nameSpace, room, cb) {
+    io.of(nameSpace.endpoint)
+        .in(room)
+        .fetchSockets()
+        .then((totalSockets) => {
+            cb(totalSockets.length)
+            io.of(nameSpace.endpoint)
+                .in(room)
+                .emit('update-user-count', totalSockets.length)
+        })
+        .catch((err) => {
+            throw err
+        })
+}
