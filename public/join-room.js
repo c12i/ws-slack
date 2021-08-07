@@ -28,4 +28,22 @@ function joinRoom(room) {
         memberCountNode.textContent = data + ' '
         memberCountNode.appendChild(spanNode)
     })
+
+    const searchBox = document.querySelector('#search-box')
+    searchBox.addEventListener('input', (e) => {
+        let messages = Array.from(
+            document.getElementsByClassName('message-text')
+        )
+        messages.forEach((message) => {
+            if (
+                message.textContent
+                    .toLowerCase()
+                    .indexOf(e.target.value.toLowerCase()) === -1
+            ) {
+                message.parentNode.parentElement.style.display = 'none'
+            } else {
+                message.parentNode.parentElement.style.display = 'flex'
+            }
+        })
+    })
 }
